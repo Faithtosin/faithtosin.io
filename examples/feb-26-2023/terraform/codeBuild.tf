@@ -66,12 +66,6 @@ resource "aws_codebuild_project" "github-actions-runner" {
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
   }
-  logs_config {
-    cloudwatch_logs {
-      group_name  = "log-group"
-      stream_name = "log-stream"
-    }
-  }
 
   source {
     type            = "GITHUB"

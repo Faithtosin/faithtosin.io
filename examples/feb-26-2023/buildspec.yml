@@ -1,0 +1,31 @@
+version: 0.2
+
+# #Read secrets and variables
+# env:
+#   variables:
+#      key: "value"
+#      key2: "value"
+#   parameter-store:
+#      key: "value"
+#      key2: "value"
+#   secrets-manager:
+#      key: secret-id:json-key:version-stage:version-id
+#      key2: secret-id:json-key:version-stage:version-id
+phases:
+  install:
+    commands:
+      # Update libs
+      - apt-get update
+  pre_build:
+    commands:
+      # # Install dependencies
+      # - npm install
+      # - npm run test:ci
+  build:
+    commands:
+      # - npm run build:ci
+  post_build:
+    commands:
+      # copy files to s3
+      - aws s3 sync . s3://my-s3-test-website-bucket --acl 'public-read' --delete
+      - aws cloudfront create-invalidation --distribution-id E1XZQXQZJQZJ9 --paths "/*"

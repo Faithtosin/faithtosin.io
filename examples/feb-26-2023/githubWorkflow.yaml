@@ -1,0 +1,40 @@
+on:
+  push:
+    branches:
+      - master
+    
+name: github-actions-codebuild-example
+
+jobs:
+  build:
+    name: build-and-deploy
+    runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: ${{ secrets.OIDC_ROLE_TO_ASSUME }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Run CodeBuild
+      uses: aws-actions/aws-codebuild-run-build@v1
+      with:
+        project-name: github-actions-example
+        buildspec-override: examples/feb-26-2023/buildspec.yml
+        env-vars-for-codebuild: |
+          custom,
+          requester,
+          event-name
+      env:
+        custom: my environment variable
+        requester: ${{ github.actor }}
+        event-name: ${{ github.event_name }}
+
+ 

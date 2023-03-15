@@ -7,3 +7,6 @@ variable "codebuild_project_name" {
   type = string
 }
 
+variable "branch" {
+  type = string
+}

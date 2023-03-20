@@ -1,4 +1,4 @@
-#AWS APP Runner infra
+# AWS APP Runner infra
 
 To Deploy the Sample infra:
 

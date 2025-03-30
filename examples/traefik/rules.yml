@@ -1,0 +1,50 @@
+http:
+  middlewares:
+    test-auth:
+      basicAuth:
+        #Passwords must be hashed using MD5, SHA1, or BCrypt.
+        #echo $(htpasswd -nb user password) | sed -e s/\\$/\\$\\$/g
+        users:
+          - "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
+          - "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"
+          - "test:$apr1$jXivqnzQ$8Fc7pxMi9R6bVMJSLu0Sv1" #username:test password:password
+    https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+  services:
+    traefik-dashboard:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8080"
+    service-01:
+      loadBalancer:
+        servers:
+          - url: "http://service-01:80"
+  routers:
+    dashboard-router:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`traefik-dashboard.demo.faithtosin.cloud`)"
+      middlewares:
+        - "test-auth"
+        - "https-redirectscheme"
+      service: "traefik-dashboard"
+      tls:
+        certResolver: resolver-01
+        domains:
+          - main: "traefik-dashboard.demo.faithtosin.cloud"
+    service-01-router:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`service-01.demo.faithtosin.cloud`)"
+      middlewares:
+        - "test-auth"
+        - "https-redirectscheme"
+      service: "service-01"
+      tls:
+        certResolver: resolver-01
+        domains: #Optional to specify domains to request certs for
+          - main: "service-01.demo.faithtosin.cloud"
+            sans:
+              - "service-02.demo.faithtosin.cloud"

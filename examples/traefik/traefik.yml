@@ -1,0 +1,43 @@
+global:
+  sendAnonymousUsage: false
+
+log:
+  level: "INFO"
+accessLog:
+  filePath: "/var/log/traefik/access.log"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    watch: true
+    exposedByDefault: false
+  file:
+    filename: "/etc/traefik/conf.d/rules.yml"
+    watch: true
+
+api:
+  dashboard: true
+  debug: false
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  resolver-01:
+    acme:
+      email: xxxxxxxxxxxx@gmail.com
+      #chmod 600 acme.json
+      storage: acme.json
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # For testing
+      httpChallenge:
+        # used during the challenge
+        entryPoint: web
